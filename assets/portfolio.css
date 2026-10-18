@@ -1,0 +1,246 @@
+/* Base styles for the reference portfolio layout. */
+*, *::before, *::after {box-sizing:border-box;margin:0;padding:0}
+html {font-size:16px;scroll-behavior:smooth}
+body {background:#030712}
+a {color:inherit;text-decoration:none}
+button {font:inherit;border:0;background:none}
+img,svg {vertical-align:middle}
+[hidden] {display:none!important}
+/* ══ The portfolio ═════════════════════════════════════
+   Laid out after tedawf.com, in its dark colours: one narrow column. A
+   sticky row of links; an intro with a heading, a short bio, a
+   CV button and icon links beside a photo; three highlights; work,
+   education and skills as tabs over a timeline card; two project cards
+   side by side; further projects as a list card; contact; a quiet footer.
+   Calistoga for the headings, Inter for everything else. */
+body.portfolio-page {
+  --pf-bg: #030712;
+  --pf-ink: #f9fafb;
+  --pf-muted: #9ca3af;
+  --pf-line: #1f2937;
+  --pf-soft: #1f2937;
+  --pf-display: 'Calistoga', Georgia, serif;
+  --pf-text: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html:has(.portfolio-page) { scroll-padding-top: 80px; scroll-snap-type: none; }
+.portfolio-page main[data-static-content] { background: var(--pf-bg); }
+
+/* ── Shared ─────────────────────────────── */
+.pf-shell { width: 100%; max-width: 768px; margin-inline: auto; padding-inline: 32px; }
+.pf-section, .portfolio-nav, .pf-footer {
+  color: var(--pf-ink);
+  font-family: var(--pf-text);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.pf-section { background: var(--pf-bg); padding-top: 64px; }
+.pf-section:last-of-type { padding-bottom: 32px; }
+.pf-section :is(h1, h2, h3, h4) { font-weight: 600; letter-spacing: normal; }
+.pf-section :is(h1, h2) { font-family: var(--pf-display); font-weight: 400; line-height: 1.2; }
+.pf-section h2 { font-size: 1.875rem; }
+.pf-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.pf-i { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; }
+.pf-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.pf-card { background: var(--pf-bg); border: 1px solid var(--pf-line); border-radius: 12px; }
+
+.pf-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.pf-tags li { padding: 2px 8px; border-radius: 6px; background: var(--pf-soft); font-size: .75rem; font-weight: 600; line-height: 1.6; }
+.pf-tags li span { margin-left: 4px; color: var(--pf-muted); font-weight: 500; }
+.pf-tags--outline li { background: none; border: 1px solid var(--pf-line); font-weight: 500; }
+
+/* Light buttons and badges on the dark ground, as on the project cards. */
+.pf-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; background: var(--pf-ink); color: var(--pf-bg); font-size: .75rem; font-weight: 600; line-height: 1.5; transition: background-color .15s ease; }
+.pf-pill .pf-i { width: .9rem; height: .9rem; }
+.pf-pill:hover { background: #d1d5db; }
+.pf-badge { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 6px; background: var(--pf-ink); color: var(--pf-bg); font-size: .72rem; font-weight: 600; }
+
+.pf-icon-link { display: inline-grid; place-items: center; width: 36px; height: 36px; color: var(--pf-muted); border-radius: 6px; transition: color .15s ease; }
+.pf-icon-link:hover { color: var(--pf-ink); }
+
+/* Section heading on the left, a muted link or note on the right. */
+.pf-heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
+.pf-view-more, .pf-heading-row__aside { display: inline-flex; align-items: center; gap: 8px; color: var(--pf-muted); white-space: nowrap; }
+.pf-view-more { transition: color .15s ease; }
+.pf-view-more:hover { color: var(--pf-ink); }
+.pf-view-more .pf-i { width: 1.1rem; height: 1.1rem; transition: transform .15s ease; }
+.pf-view-more:hover .pf-i { transform: translateX(3px); }
+.pf-heading-row__aside { font-size: .875rem; }
+.pf-heading-row__aside .pf-i { width: 1rem; height: 1rem; }
+
+.pf-section :focus-visible, .portfolio-nav :focus-visible, .pf-footer :focus-visible { outline: 2px solid var(--pf-ink); outline-offset: 3px; border-radius: 6px; }
+.pf-skip-link { position: fixed; z-index: 100; left: 20px; top: -100px; padding: 12px 18px; background: var(--pf-ink); color: var(--pf-bg); border-radius: 6px; font-family: var(--pf-text); }
+.pf-skip-link:focus { top: 16px; }
+
+/* ── Menu ───────────────────────────────── */
+/* Ted's header blurs what scrolls under it. Over this plain ground a nearly
+   opaque fill looks the same, without a blur pass on every scroll frame. */
+.portfolio-nav { position: sticky; top: 0; z-index: 20; background: rgba(3, 7, 18, .94); }
+.portfolio-nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 72px; }
+.portfolio-nav__links { display: flex; gap: 24px; }
+.portfolio-nav__links a { color: var(--pf-muted); white-space: nowrap; transition: color .15s ease; }
+.portfolio-nav__links a:hover, .portfolio-nav__links a[aria-current="location"] { color: var(--pf-ink); }
+.pf-nav-cv { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--pf-line); border-radius: 6px; font-size: .875rem; font-weight: 500; transition: background-color .15s ease; }
+.pf-nav-cv .pf-i { width: 1rem; height: 1rem; }
+.pf-nav-cv:hover { background: var(--pf-soft); }
+
+/* ── Intro ──────────────────────────────── */
+.portfolio-page #alder { min-height: 0; }
+.pf-intro { padding-top: 32px; }
+.pf-intro:focus { outline: none; }
+.pf-intro__grid { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.pf-intro__copy { min-width: 0; }
+.pf-intro h1 { font-size: 3rem; text-wrap: balance; }
+.pf-wave { display: inline-block; }
+.pf-intro__role { margin-top: 4px; }
+.pf-intro__place { margin-left: 6px; color: var(--pf-muted); font-size: .875rem; white-space: nowrap; }
+.pf-intro__bio { margin-top: 16px; max-width: 30rem; }
+.pf-intro__note { margin-top: 12px; max-width: 30rem; color: var(--pf-muted); font-size: .875rem; }
+.pf-intro__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 24px; }
+.pf-outline-button { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 14px; border: 1px solid var(--pf-line); border-radius: 6px; font-size: .875rem; font-weight: 600; transition: background-color .15s ease; }
+.pf-outline-button .pf-i { width: 1rem; height: 1rem; }
+.pf-outline-button:hover { background: var(--pf-soft); }
+
+/* The photo as the top card of a small stack. */
+.pf-photo { position: relative; flex: 0 0 176px; width: 176px; aspect-ratio: 3 / 4; margin-right: 12px; }
+.pf-photo::before, .pf-photo::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
+.pf-photo::before { transform: rotate(-6deg) translate(-10px, 4px); background: #1f2937; }
+.pf-photo::after { transform: rotate(5deg) translate(10px, 2px); background: #374151; }
+.pf-photo img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, .5); }
+
+/* ── Highlights ─────────────────────────── */
+.pf-highlights { padding-top: 40px; }
+.pf-highlights__list { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pf-highlights__list li { padding: 16px; }
+.pf-highlights__mark { display: block; margin-bottom: 6px; font-size: 1rem; line-height: 1; }
+.pf-highlights__list h3 { font-size: .9375rem; }
+.pf-highlights__list p { margin-top: 4px; color: var(--pf-muted); font-size: .8125rem; }
+
+/* ── Work, education, skills ────────────── */
+.pf-tabs__list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 8px; background: var(--pf-soft); }
+.pf-tabs__list[hidden] { display: none; }
+.pf-tabs__list button { padding: 6px 12px; border-radius: 6px; color: var(--pf-muted); font-size: .875rem; font-weight: 500; cursor: pointer; transition: color .15s ease, background-color .15s ease; }
+.pf-tabs__list button:hover { color: var(--pf-ink); }
+.pf-tabs__list button[aria-selected="true"] { background: var(--pf-bg); color: var(--pf-ink); }
+.pf-panel + .pf-panel { margin-top: 16px; }
+.pf-tabs.is-tabbed .pf-panel + .pf-panel { margin-top: 0; }
+.pf-panel__title { padding: 20px 24px 0; font-size: .875rem; color: var(--pf-muted); }
+.pf-tabs.is-tabbed .pf-panel__title { display: none; }
+
+/* A line down the card's left, a round mark on it for each place. */
+.pf-timeline { list-style: none; margin-left: 40px; padding: 24px 24px 24px 0; border-left: 1px solid var(--pf-line); }
+.pf-timeline__item { position: relative; margin-left: 40px; }
+.pf-timeline__item + .pf-timeline__item { margin-top: 32px; }
+.pf-timeline__logo { position: absolute; top: -4px; left: -61px; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid var(--pf-line); border-radius: 50%; background: var(--pf-bg); }
+.pf-timeline__logo img { width: 24px; height: 24px; object-fit: contain; }
+.pf-timeline__head { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; }
+.pf-timeline__head h4 { grid-column: 1 / -1; font-size: 1rem; line-height: 1.25; }
+.pf-timeline__role { margin-top: 2px; color: var(--pf-muted); font-size: .875rem; }
+.pf-timeline__date { align-self: end; color: var(--pf-muted); font-size: .75rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pf-timeline__points { margin-top: 8px; padding-left: 16px; list-style: disc; font-size: .875rem; }
+.pf-timeline__points li + li { margin-top: 2px; }
+
+.pf-skills { padding: 8px 24px; }
+.pf-skills > div { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 16px; padding-block: 16px; }
+.pf-skills > div + div { border-top: 1px solid var(--pf-line); }
+.pf-skills dt { font-size: .875rem; font-weight: 600; }
+.pf-skills dd { font-size: .875rem; }
+.pf-skills__note { display: block; margin-top: 8px; color: var(--pf-muted); font-size: .8rem; }
+
+/* ── Project cards ──────────────────────── */
+.pf-project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.pf-project { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.pf-project__media { padding: 16px 16px 0; }
+.pf-project__media video { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 8px; background: #000; box-shadow: 0 4px 12px rgba(0, 0, 0, .4); }
+.pf-project__body { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: 16px 20px 20px; }
+.pf-project__body .pf-badge { margin-bottom: 10px; }
+.pf-project h3 { font-size: 1rem; line-height: 1.25; }
+.pf-project__meta { margin-top: 2px; color: var(--pf-muted); font-size: .75rem; }
+.pf-project__points { margin-top: 10px; padding-left: 16px; list-style: disc; color: var(--pf-muted); font-size: .8125rem; }
+.pf-project__points li + li { margin-top: 6px; }
+.pf-project .pf-tags { margin-top: 14px; }
+.pf-project .pf-tags li { font-size: .6875rem; }
+.pf-project__links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 16px; }
+
+/* ── Further projects, as a list ────────── */
+.pf-list__item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 24px; padding: 24px; }
+.pf-list__item + .pf-list__item { border-top: 1px solid var(--pf-line); }
+.pf-list__item h3 { font-size: 1.125rem; line-height: 1.35; }
+.pf-list__item h3 a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pf-list__main p { margin-top: 8px; color: var(--pf-muted); font-size: .875rem; }
+.pf-list__main .pf-tags { margin-top: 14px; }
+.pf-list__meta { list-style: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; color: var(--pf-muted); font-size: .875rem; }
+.pf-list__meta li { display: inline-flex; align-items: center; gap: 6px; }
+.pf-list__meta .pf-i { width: 1rem; height: 1rem; }
+
+/* ── Contact ────────────────────────────── */
+.pf-contact__card { padding: 24px; }
+.pf-contact__card h3 { font-size: 1.125rem; }
+.pf-contact__card > p { margin-top: 8px; max-width: 34rem; color: var(--pf-muted); font-size: .9375rem; }
+.pf-contact__list { list-style: none; display: grid; gap: 4px; margin-top: 18px; }
+.pf-contact__list a { display: inline-flex; align-items: center; gap: 10px; padding-block: 4px; font-size: .9375rem; }
+.pf-contact__list a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pf-contact__list .pf-i { width: 1.1rem; height: 1.1rem; color: var(--pf-muted); }
+.pf-pill--large { margin-top: 20px; padding: 8px 14px; font-size: .875rem; }
+.pf-pill--large .pf-i { width: 1rem; height: 1rem; }
+
+/* ── Footer ─────────────────────────────── */
+.pf-footer { background: var(--pf-bg); }
+.pf-footer__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 48px 56px; }
+.pf-footer p { color: var(--pf-muted); font-size: .75rem; }
+.pf-footer p span { margin-inline: 4px; }
+.pf-footer__icons { display: flex; gap: 8px; }
+
+/* ── Smaller screens ────────────────────── */
+@media (max-width: 640px) {
+  html:has(.portfolio-page) { scroll-padding-top: 68px; }
+  .pf-shell { padding-inline: 24px; }
+  .portfolio-nav__inner { height: 60px; }
+  .portfolio-nav__links { gap: 12px; font-size: .875rem; }
+  /* The photo above the heading, as there. */
+  .pf-intro__grid { flex-direction: column-reverse; align-items: flex-start; }
+  .pf-photo { flex-basis: auto; width: 150px; margin: 8px 0 8px 12px; }
+  .pf-highlights { padding-top: 32px; }
+  .pf-highlights__list { grid-template-columns: 1fr; gap: 10px; }
+  .pf-intro h1 { font-size: 2.25rem; }
+  .pf-intro__place { display: block; margin: 2px 0 0; }
+  .pf-section h2 { font-size: 1.5rem; }
+  .pf-timeline { margin-left: 32px; padding: 20px 16px 20px 0; }
+  .pf-timeline__item { margin-left: 32px; }
+  .pf-timeline__logo { left: -53px; width: 40px; height: 40px; }
+  .pf-timeline__head { grid-template-columns: 1fr; }
+  .pf-timeline__date { align-self: start; margin-top: 2px; }
+  .pf-skills { padding: 4px 18px; }
+  .pf-skills > div { grid-template-columns: 1fr; gap: 8px; }
+  .pf-project-grid { grid-template-columns: 1fr; }
+  .pf-list__item { grid-template-columns: 1fr; padding: 20px; }
+  .pf-list__meta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
+  .pf-contact__card { padding: 20px; }
+}
+
+@media (max-width: 380px) {
+  .portfolio-nav__links { gap: 10px; font-size: .8125rem; }
+  .pf-nav-cv { padding: 5px 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-nav *, .pf-section *, .pf-footer * { transition: none !important; }
+}
+
+@media print {
+  /* Dark on paper wastes ink and prints muddy: printed, it is light. */
+  body.portfolio-page { --pf-bg: #fff; --pf-ink: #030712; --pf-muted: #4b5563; --pf-line: #d1d5db; --pf-soft: #f3f4f6; }
+  .portfolio-nav, .pf-skip-link, .pf-project__media, .pf-tabs__list { display: none !important; }
+  .pf-section { padding-top: 24px; break-inside: avoid; }
+  .pf-tabs .pf-panel[hidden] { display: block !important; }
+  .pf-tabs .pf-panel__title { display: block !important; }
+}
+
+.pf-project__media img {display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;border-radius:8px;background:#0b1220}
+.pf-contact__list a {overflow-wrap:anywhere;max-width:100%}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Official school logos on a light backing for contrast. */
+.pf-timeline__logo--school {background:#fff}
+.pf-timeline__logo--school img {width:34px;height:28px;object-fit:contain}
