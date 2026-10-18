@@ -244,3 +244,7 @@ html:has(.portfolio-page) { scroll-padding-top: 80px; scroll-snap-type: none; }
 /* Official school logos on a light backing for contrast. */
 .pf-timeline__logo--school {background:#fff}
 .pf-timeline__logo--school img {width:34px;height:28px;object-fit:contain}
+
+/* Employer logo and role icons in the work timeline. */
+.pf-timeline__logo--employer {background:#fff}
+.pf-timeline__logo--employer img {width:34px;height:28px;object-fit:contain}
