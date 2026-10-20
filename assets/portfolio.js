@@ -87,3 +87,13 @@
     if (document.hidden) videos.forEach(video => video.pause());
   });
 })();
+
+// Rotate areas of interest without moving the surrounding content.
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const specialty = document.getElementById('specialty');
+  const subjects = ['Systemanalyse', 'Webutvikling', 'Databaser', 'KI i praksis'];
+  let subject = 0;
+  if (specialty) setInterval(() => {
+    if (!document.hidden) specialty.textContent = subjects[++subject % subjects.length];
+  }, 3000);
+}
