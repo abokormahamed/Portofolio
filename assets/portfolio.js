@@ -1,99 +1,146 @@
-/* Small enhancements only: every section, link and demo works without these. */
 (() => {
-  /* ── The sticky menu marks the section being read ── */
-  const nav = document.querySelector('.portfolio-nav');
-  if (nav) {
-    const links = [...nav.querySelectorAll('a[href^="#"]')]
-      .filter(link => link.getAttribute('href') !== '#top');
-    const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
-    let frame = 0;
-
-    function updateNavigation() {
-      frame = 0;
-      const threshold = nav.offsetHeight + window.innerHeight * 0.3;
-      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-      const active = atBottom ? sections.at(-1) : sections.filter(section => section.getBoundingClientRect().top <= threshold).at(-1);
-      links.forEach(link => {
-        if (active && link.getAttribute('href') === `#${active.id}`) link.setAttribute('aria-current', 'location');
-        else link.removeAttribute('aria-current');
-      });
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior = reduceMotion ? 'instant' : 'smooth';
+  const home = document.getElementById('home');
+  const menu = document.getElementById('menu-overlay');
+  const menuButtons = [...document.querySelectorAll('[data-menu-toggle]')];
+  let menuOpener;
+  const closeMenu = () => {
+    menu.hidden = true;
+    document.body.style.overflow = '';
+    menuButtons.forEach(button => button.setAttribute('aria-expanded', 'false'));
+    menuOpener?.focus({ preventScroll: true });
+  };
+  menuButtons.forEach(button => button.addEventListener('click', () => {
+    if (!menu.hidden) return closeMenu();
+    menuOpener = button;
+    menu.hidden = false;
+    document.body.style.overflow = 'hidden';
+    menuButtons.forEach(item => item.setAttribute('aria-expanded', 'true'));
+    document.getElementById('close-menu').focus();
+  }));
+  document.getElementById('close-menu').addEventListener('click', closeMenu);
+  menu.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeMenu();
+    if (event.key !== 'Tab') return;
+    const items = [...menu.querySelectorAll('a, button')];
+    if (event.shiftKey && document.activeElement === items[0]) {
+      event.preventDefault(); items.at(-1).focus();
+    } else if (!event.shiftKey && document.activeElement === items.at(-1)) {
+      event.preventDefault(); items[0].focus();
     }
-
-    function scheduleNavigation() {
-      if (!frame) frame = requestAnimationFrame(updateNavigation);
-    }
-
-    window.addEventListener('scroll', scheduleNavigation, { passive: true });
-    window.addEventListener('resize', scheduleNavigation, { passive: true });
-    updateNavigation();
-  }
-
-  document.querySelector('.pf-skip-link')?.addEventListener('click', () => {
-    document.getElementById('alder')?.focus({ preventScroll: true });
   });
-
-  /* ── Arbeid, Utdanning and Kompetanse as tabs ──
-     Without this script the three lists simply stand one under another,
-     each with its own heading. */
-  const tabs = document.querySelector('.pf-tabs');
-  const tablist = tabs?.querySelector('[role="tablist"]');
-  if (tabs && tablist) {
-    const buttons = [...tablist.querySelectorAll('[role="tab"]')];
-    const panels = buttons.map(button => document.getElementById(button.getAttribute('aria-controls')));
-
-    function select(index, { focus = false } = {}) {
-      buttons.forEach((button, i) => {
-        const selected = i === index;
-        button.setAttribute('aria-selected', String(selected));
-        button.tabIndex = selected ? 0 : -1;
-        panels[i].hidden = !selected;
-      });
-      if (focus) buttons[index].focus();
-    }
-
-    buttons.forEach((button, i) => {
-      panels[i].setAttribute('role', 'tabpanel');
-      panels[i].setAttribute('aria-labelledby', button.id);
-      panels[i].tabIndex = 0;
-      button.addEventListener('click', () => select(i));
-      button.addEventListener('keydown', event => {
-        const last = buttons.length - 1;
-        const next = { ArrowRight: i === last ? 0 : i + 1, ArrowLeft: i === 0 ? last : i - 1, Home: 0, End: last }[event.key];
-        if (next === undefined) return;
-        event.preventDefault();
-        select(next, { focus: true });
-      });
+  const scrollTo = id => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const offset = id === 'home' ? 0 : id === 'projects' ? 0 : 65;
+    window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - offset, behavior });
+    history.replaceState(null, '', `#${id}`);
+    if (!menu.hidden) closeMenu();
+  };
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', event => {
+      const id = link.getAttribute('href').slice(1);
+      if (!document.getElementById(id)) return;
+      event.preventDefault(); scrollTo(id);
+      if (link.classList.contains('skip-link')) {
+        const target = document.getElementById(id);
+        target.tabIndex = -1;
+        target.focus({ preventScroll: true });
+      }
     });
-
-    tablist.hidden = false;
-    tabs.classList.add('is-tabbed');
-    select(0);
-  }
-
-  /* ── Demo videos: one at a time, paused when out of sight ── */
-  const videos = [...document.querySelectorAll('.pf-project__media video')];
-  videos.forEach(video => {
-    video.addEventListener('play', () => videos.forEach(other => {
-      if (other !== video) other.pause();
-    }));
   });
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (!entry.isIntersecting) entry.target.pause(); });
-    }, { threshold: 0 });
-    videos.forEach(video => observer.observe(video));
-  }
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) videos.forEach(video => video.pause());
+  const activateOnKeyboard = element => element.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault(); element.click();
+    }
   });
-})();
-
-// Rotate areas of interest without moving the surrounding content.
-if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const specialty = document.getElementById('specialty');
-  const subjects = ['Systemanalyse', 'Webutvikling', 'Databaser', 'KI i praksis'];
-  let subject = 0;
-  if (specialty) setInterval(() => {
-    if (!document.hidden) specialty.textContent = subjects[++subject % subjects.length];
+  document.querySelectorAll('[data-scroll]').forEach(element => {
+    element.addEventListener('click', () => scrollTo(element.dataset.scroll));
+    if (element.tagName !== 'BUTTON') activateOnKeyboard(element);
+  });
+  const panels = [...document.querySelectorAll('[data-panel]')];
+  const choices = [...document.querySelectorAll('[data-project]')];
+  const backdrop = document.getElementById('project-backdrop');
+  const mobile = matchMedia('(max-width: 767px)');
+  let activeProject = -1;
+  function setProject(index) {
+    if (index === activeProject) return;
+    activeProject = index;
+    choices.forEach((choice, i) => {
+      if (i === index) choice.setAttribute('aria-current', 'true');
+      else choice.removeAttribute('aria-current');
+    });
+    backdrop.style.backgroundImage = `url("${panels[index].dataset.image}")`;
+  }
+  choices.forEach((choice, i) => {
+    choice.addEventListener('click', () => {
+      const offset = mobile.matches ? 225 : 0;
+      window.scrollTo({ top: panels[i].getBoundingClientRect().top + scrollY - offset, behavior });
+    });
+    activateOnKeyboard(choice);
+  });
+  const navLinks = [...document.querySelectorAll('[data-nav]')];
+  const sections = navLinks.map(link => document.getElementById(link.dataset.nav));
+  let frame;
+  function onScroll() {
+    frame = null;
+    document.body.classList.toggle('has-scrolled', scrollY > home.offsetHeight * .65);
+    const middle = innerHeight * .5;
+    let index = 0;
+    panels.forEach((panel, i) => {
+      if (panel.getBoundingClientRect().top <= middle) index = i;
+    });
+    setProject(index);
+    let current = 0;
+    sections.forEach((section, i) => {
+      if (section.getBoundingClientRect().top <= innerHeight * .35) current = i;
+    });
+    if (scrollY + innerHeight >= document.documentElement.scrollHeight - 5) current = sections.length - 1;
+    navLinks.forEach((link, i) => {
+      if (i === current) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  function schedule() { if (!frame) frame = requestAnimationFrame(onScroll); }
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule, { passive: true });
+  onScroll();
+  const word = document.getElementById('specialty');
+  const words = ['C#', 'Python', 'ASP.NET Core', 'SQL', 'Systemdesign'];
+  let currentWord = 0;
+  if (!reduceMotion) setInterval(() => {
+    if (document.hidden || scrollY > home.offsetHeight) return;
+    word.textContent = words[++currentWord % words.length];
+    word.classList.remove('specialty-enter');
+    requestAnimationFrame(() => requestAnimationFrame(() => word.classList.add('specialty-enter')));
   }, 3000);
-}
+  const video = document.querySelector('.hero-video');
+  video.muted = true;
+  if (reduceMotion) {
+    video.removeAttribute('autoplay'); video.pause();
+    video.setAttribute('poster', 'assets/development.jpg');
+  } else {
+    video.play().catch(() => video.setAttribute('poster', 'assets/development.jpg'));
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting && !document.hidden) video.play().catch(() => {});
+      else video.pause();
+    }));
+    observer.observe(home);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) video.pause();
+      else if (home.getBoundingClientRect().bottom > 0) video.play().catch(() => {});
+    });
+  }
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('pending-reveal');
+        observer.unobserve(entry.target);
+      }
+    }), { threshold: .08 });
+    document.querySelectorAll('#skills [data-reveal]').forEach(card => {
+      card.classList.add('pending-reveal'); observer.observe(card);
+    });
+  }
+})();
