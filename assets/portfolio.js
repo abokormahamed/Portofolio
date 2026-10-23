@@ -152,4 +152,23 @@
       card.classList.add('pending-reveal'); observer.observe(card);
     });
   }
+  // Play the project background only while it is visible.
+  document.querySelectorAll('.project-background-video').forEach(projectVideo => {
+    projectVideo.muted = true;
+    if (reduceMotion) {
+      projectVideo.autoplay = false;
+      projectVideo.pause();
+      return;
+    }
+    let visible = false;
+    const syncPlayback = () => {
+      if (visible && !document.hidden) projectVideo.play().catch(() => {});
+      else projectVideo.pause();
+    };
+    new IntersectionObserver(entries => {
+      visible = entries[0].isIntersecting;
+      syncPlayback();
+    }, { threshold: .15 }).observe(projectVideo);
+    document.addEventListener('visibilitychange', syncPlayback);
+  });
 })();
