@@ -14,3 +14,18 @@ html{scroll-behavior:smooth;scroll-padding-top:75px}body.exact-portfolio{width:1
 #project-panels .project-panel>div>div:first-child{top:72px;left:-8px;pointer-events:none}
 .project-picture img[src$='.svg']{object-fit:contain;background:#0b1220}
 #skills [data-reveal]{min-width:0}#skills [data-reveal] h3{overflow-wrap:anywhere;min-width:0}#skills [data-reveal]>.grid>div{min-width:0}#skills [data-reveal]>.grid span{overflow-wrap:anywhere}#project-sidebar .project-choice>div:nth-child(2){min-width:0}
+/* Keep education and work as distinct, balanced sections. */
+#education-grid{margin-bottom:clamp(64px,8vw,112px)}
+#education-grid + .text-center{margin-bottom:clamp(32px,4vw,56px)}
+#education-grid,#work-grid{align-items:stretch}
+#education-grid>[data-reveal],#work-grid>[data-reveal]{height:100%}
+.has-scrolled #site-header{background:rgba(16,18,20,.97);border-bottom:1px solid #ffffff12;backdrop-filter:blur(12px)}
+.has-scrolled #compact-menu{left:auto;right:0}
+@media(min-width:1100px){
+  #education-grid,#work-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #education-grid>[data-reveal],#work-grid>[data-reveal]{padding:24px}
+  #education-grid h3,#work-grid h3{font-size:20px}
+}
+@media(min-width:640px) and (max-width:1099px){
+  #education-grid>:last-child:nth-child(odd),#work-grid>:last-child:nth-child(odd){grid-column:1/-1}
+}

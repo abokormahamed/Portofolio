@@ -106,6 +106,15 @@
   addEventListener('scroll', schedule, { passive: true });
   addEventListener('resize', schedule, { passive: true });
   onScroll();
+  // Keep previously shared competence links working after the section rename.
+  function resolveLegacyHash() {
+    if (location.hash !== '#kompetanse') return;
+    const target = document.getElementById('skills');
+    history.replaceState(null, '', '#skills');
+    window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - 75, behavior: 'instant' });
+  }
+  addEventListener('hashchange', resolveLegacyHash);
+  addEventListener('load', resolveLegacyHash, { once: true });
   const word = document.getElementById('specialty');
   const words = ['C#', 'Python', 'ASP.NET Core', 'SQL', 'Systemdesign'];
   let currentWord = 0;
